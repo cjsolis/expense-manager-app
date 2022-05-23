@@ -191,25 +191,25 @@ header h1 {
     width: 25rem;
 }
 
-.container-budget {
+.content-budget {
     width: 100%;
 }
-.container-budget p {
+.content-budget p {
     font-weight: 400;
     color: var(--gris-oscuro);
     font-size: 2.4rem;
     text-align: center;
 }
 @media (min-width: 768px) {
-    .container-budget p {
+    .content-budget p {
         text-align: left;
     }
 }
-.container-budget p.negative,
-.container-budget p.negative span {
+.content-budget p.negative,
+.content-budget p.negative span {
     color: red;
 }
-.container-budget span {
+.content-budget span {
     font-weight: 900;
     color: var(--azul);
 }
