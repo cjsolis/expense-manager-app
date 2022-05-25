@@ -5,6 +5,7 @@ import {
   FC,
   FormEvent,
   SetStateAction,
+  useEffect,
   useState,
 } from "react";
 import IconClose from "../img/icon_close.svg";
@@ -22,6 +23,8 @@ export interface IModalProps {
   setModal: Dispatch<SetStateAction<boolean>>;
   setAnimateModal: Dispatch<SetStateAction<boolean>>;
   setExpenses: Dispatch<SetStateAction<IExpense[]>>;
+  expenseToEdit: IExpense;
+  setExpenseToEdit: Dispatch<SetStateAction<IExpense>>
 }
 
 const Modal: FC<IModalProps> = ({
@@ -29,15 +32,24 @@ const Modal: FC<IModalProps> = ({
   setModal,
   setAnimateModal,
   setExpenses,
+  expenseToEdit,
+  setExpenseToEdit,
 }) => {
   const [expense, setExpense] = useState<IExpense>(getDefaultExpense);
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (JSON.stringify(expenseToEdit) !== JSON.stringify(getDefaultExpense())) {
+      setExpense(expenseToEdit);
+    }
+  }, [expenseToEdit]);
 
   const formRef = createRef<HTMLFormElement>();
 
   const handleClose = () => {
     setAnimateModal(false);
     setTimeout(() => setModal(false), 300);
+    setExpenseToEdit(getDefaultExpense)
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -55,7 +67,7 @@ const Modal: FC<IModalProps> = ({
 
     setErrorMessage("");
     expense.id = generateRandomId();
-    expense.date = generateCurrentDate()
+    expense.date = generateCurrentDate();
     setExpenses((prev) => (prev ? [...prev, expense] : [expense]));
     handleClearForm();
     handleClose();
@@ -63,7 +75,13 @@ const Modal: FC<IModalProps> = ({
 
   const handleChange = (e: ChangeEvent<any>) => {
     const key: keyof IExpense = e.target.id;
-    const value: string = e.target.value;
+    let value;
+    if (key === "amount") {
+      value = Number(e.target.value);
+    } else {
+      value = String(e.target.value);
+    }
+
     const updatedField = { [key]: value };
     setExpense({ ...expense, ...updatedField });
   };
@@ -93,6 +111,7 @@ const Modal: FC<IModalProps> = ({
             type="text"
             placeholder="Expense name"
             onChange={handleChange}
+            value={expense.name}
           />
         </div>
 
@@ -103,12 +122,17 @@ const Modal: FC<IModalProps> = ({
             type="number"
             placeholder="Amount in colones"
             onChange={handleChange}
+            value={expense.amount > 0 ? expense.amount : undefined}
           />
         </div>
 
         <div className="field">
           <label htmlFor="cateogry">Cateogry</label>
-          <select id="category" onChange={handleChange}>
+          <select
+            id="category"
+            onChange={handleChange}
+            value={expense.category}
+          >
             <option value="">-- Select option --</option>
             <option value="savings">Savings</option>
             <option value="food">Food</option>
