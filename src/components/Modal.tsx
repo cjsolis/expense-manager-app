@@ -24,7 +24,7 @@ export interface IModalProps {
   setAnimateModal: Dispatch<SetStateAction<boolean>>;
   setExpenses: Dispatch<SetStateAction<IExpense[]>>;
   expenseToEdit: IExpense;
-  setExpenseToEdit: Dispatch<SetStateAction<IExpense>>
+  setExpenseToEdit: Dispatch<SetStateAction<IExpense>>;
 }
 
 const Modal: FC<IModalProps> = ({
@@ -49,7 +49,7 @@ const Modal: FC<IModalProps> = ({
   const handleClose = () => {
     setAnimateModal(false);
     setTimeout(() => setModal(false), 300);
-    setExpenseToEdit(getDefaultExpense)
+    setExpenseToEdit(getDefaultExpense);
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -66,9 +66,18 @@ const Modal: FC<IModalProps> = ({
     }
 
     setErrorMessage("");
-    expense.id = generateRandomId();
-    expense.date = generateCurrentDate();
-    setExpenses((prev) => (prev ? [...prev, expense] : [expense]));
+
+    if (expense.id) {
+      setExpenses((prev) => {
+        const filtered = prev.filter((previous) => previous.id !== expense.id);
+        return [...filtered, expense];
+      });
+    } else {
+      expense.id = generateRandomId();
+      expense.date = generateCurrentDate();
+      setExpenses((prev) => (prev ? [...prev, expense] : [expense]));
+    }
+
     handleClearForm();
     handleClose();
   };
@@ -102,7 +111,11 @@ const Modal: FC<IModalProps> = ({
         onSubmit={handleSubmit}
         ref={formRef}
       >
-        <legend>New Expense</legend>
+        <legend>
+          {JSON.stringify(expenseToEdit) !== JSON.stringify(getDefaultExpense())
+            ? "Edit expense"
+            : "New expense"}
+        </legend>
 
         <div className="field">
           <label htmlFor="name">Expense name</label>
@@ -144,7 +157,15 @@ const Modal: FC<IModalProps> = ({
           </select>
         </div>
         {errorMessage && <Message message={errorMessage} type="error" />}
-        <input type="submit" />
+        <input
+          type="submit"
+          value={
+            JSON.stringify(expenseToEdit) !==
+            JSON.stringify(getDefaultExpense())
+              ? "Edit expense"
+              : "Save expense"
+          }
+        />
       </form>
     </div>
   );

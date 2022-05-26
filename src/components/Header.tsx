@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { Dispatch, FC, SetStateAction } from "react";
 import { IBudgetProps } from "../types/BudgetProps.interface";
 import { IExpense } from "../types/Expense.interface";
 import BudgetControl from "./BudgetControl";
